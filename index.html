@@ -56,10 +56,10 @@
 
 <body>
     <div class="container-fluid">
-        <header class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-3">
+        <header class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-2">
             <div class="container">
                 <!-- Brand -->
-                <a class="navbar-brand h4 m-0">📊 Financial Planner</a>
+                <a class="navbar-brand fw-bold">📊 Financial Planner</a>
 
                 <!-- Toggler for mobile -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarActions">
@@ -68,7 +68,7 @@
 
                 <!-- Actions -->
                 <div class="collapse navbar-collapse justify-content-end" id="navbarActions">
-                    <div class="btn-toolbar gap-2" role="toolbar">
+                    <div class="btn-toolbar gap-2 d-none d-lg-flex" role="toolbar">
 
                         <!-- Main Action -->
                         <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#itemModal">
@@ -81,23 +81,12 @@
                                 ⚙️ Manage
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <button class="dropdown-item" data-bs-toggle="modal"
-                                        data-bs-target="#semesterModal">
-                                        🗓️ Semester
-                                    </button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item" data-bs-toggle="modal"
-                                        data-bs-target="#accountsModal">
-                                        🏦 Accounts
-                                    </button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#savingsModal">
-                                        💰 Savings
-                                    </button>
-                                </li>
+                                <li><button class="dropdown-item" data-bs-toggle="modal"
+                                        data-bs-target="#semesterModal">🗓️ Semester</button></li>
+                                <li><button class="dropdown-item" data-bs-toggle="modal"
+                                        data-bs-target="#accountsModal">🏦 Accounts</button></li>
+                                <li><button class="dropdown-item" data-bs-toggle="modal"
+                                        data-bs-target="#savingsModal">💰 Savings</button></li>
                             </ul>
                         </div>
 
@@ -107,29 +96,72 @@
                                 📂 Data
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
+                                <li><button class="dropdown-item" onclick="exportData()">⬇️ Export Data</button></li>
+                                <li><button class="dropdown-item"
+                                        onclick="document.getElementById('importFile').click()">⬆️ Import Data</button></li>
                                 <li>
-                                    <button class="dropdown-item" onclick="exportData()">⬇️ Export</button>
+                                    <hr class="dropdown-divider">
                                 </li>
+                                <li><button class="dropdown-item text-danger" onclick="resetCycle()">🗑️ New
+                                        Cycle</button></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Menu -->
+                    <ul class="navbar-nav d-lg-none mt-3">
+                        <li class="nav-item">
+                            <button class="btn btn-outline-light w-100 mb-2" data-bs-toggle="modal"
+                                data-bs-target="#itemModal">
+                                ➕ Income/Expense
+                            </button>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <button class="btn btn-outline-light w-100 dropdown-toggle mb-2" data-bs-toggle="dropdown">
+                                ⚙️ Manage
+                            </button>
+                            <ul class="dropdown-menu w-100 mb-3">
+                                <li><button class="dropdown-item text-center" data-bs-toggle="modal"
+                                        data-bs-target="#semesterModal">🗓️ Semester</button></li>
                                 <li>
-                                    <button class="dropdown-item"
-                                        onclick="document.getElementById('importFile').click()">⬆️ Import</button>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><button class="dropdown-item text-center" data-bs-toggle="modal"
+                                        data-bs-target="#accountsModal">🏦 Accounts</button></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><button class="dropdown-item text-center" data-bs-toggle="modal"
+                                        data-bs-target="#savingsModal">💰 Savings</button></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <button class="btn btn-outline-light w-100 dropdown-toggle mb-2" data-bs-toggle="dropdown">
+                                📂 Data
+                            </button>
+                            <ul class="dropdown-menu w-100 mb-3">
+                                <li><button class="dropdown-item text-center" onclick="exportData()">⬇️ Export Data</button>
                                 </li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
+                                <li><button class="dropdown-item text-center"
+                                        onclick="document.getElementById('importFile').click()">⬆️ Import Data</button></li>
                                 <li>
-                                    <button class="dropdown-item text-danger" onclick="resetCycle()">🗑️ New
-                                        Cycle</button>
+                                    <hr class="dropdown-divider">
                                 </li>
+                                <li><button class="dropdown-item text-center text-danger" onclick="resetCycle()">🗑️ New
+                                        Cycle</button></li>
                             </ul>
-                        </div>
+                        </li>
+                    </ul>
 
-                        <!-- Hidden file input for import -->
-                        <input type="file" id="importFile" class="d-none" accept=".json" onchange="importData(event)">
-                    </div>
+                    <!-- Hidden file input -->
+                    <input type="file" id="importFile" class="d-none" accept=".json" onchange="importData(event)">
                 </div>
             </div>
         </header>
+
 
         <div class="container">
             <!-- Summary Row -->

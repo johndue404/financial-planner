@@ -1,0 +1,208 @@
+{
+  "semester": {
+    "year": 2025,
+    "startMonth": 6
+  },
+  "accounts": [
+    {
+      "id": "acc1",
+      "name": "Checking Account",
+      "start": 3200.50
+    },
+    {
+      "id": "acc2",
+      "name": "Savings Account",
+      "start": 1500.00
+    }
+  ],
+  "fixed": {
+    "incomes": [
+      {
+        "id": "inc1",
+        "desc": "Part-time Job",
+        "amount": 850,
+        "accountId": "acc1"
+      },
+      {
+        "id": "inc2",
+        "desc": "Scholarship",
+        "amount": 1200,
+        "accountId": "acc1"
+      }
+    ],
+    "expenses": [
+      {
+        "id": "exp1",
+        "desc": "Rent",
+        "amount": 700,
+        "accountId": "acc1"
+      },
+      {
+        "id": "exp2",
+        "desc": "Utilities & Internet",
+        "amount": 120,
+        "accountId": "acc1"
+      }
+    ]
+  },
+  "months": {
+    "2025-07": {
+      "incomes": [
+        {
+          "id": "inc3",
+          "desc": "Freelance Project",
+          "amount": 450,
+          "accountId": "acc1"
+        }
+      ],
+      "expenses": [
+        {
+          "id": "exp3",
+          "desc": "Concert Ticket",
+          "amount": 95,
+          "accountId": "acc1"
+        },
+        {
+          "id": "exp4",
+          "desc": "Weekend Trip - Porto",
+          "amount": 220,
+          "accountId": "acc1"
+        }
+      ],
+      "savings": [
+        {
+          "id": "sav1",
+          "desc": "Transferred to Savings",
+          "amount": 300,
+          "accountId": "acc2"
+        }
+      ]
+    },
+    "2025-08": {
+      "incomes": [
+        {
+          "id": "inc4",
+          "desc": "Birthday Gift (Family)",
+          "amount": 200,
+          "accountId": "acc1"
+        }
+      ],
+      "expenses": [
+        {
+          "id": "exp5",
+          "desc": "Books & Supplies",
+          "amount": 180,
+          "accountId": "acc1"
+        },
+        {
+          "id": "exp6",
+          "desc": "Dentist Check-up",
+          "amount": 75,
+          "accountId": "acc1"
+        }
+      ],
+      "savings": []
+    },
+    "2025-09": {
+      "incomes": [],
+      "expenses": [
+        {
+          "id": "exp7",
+          "desc": "Gym Membership",
+          "amount": 45,
+          "accountId": "acc1"
+        },
+        {
+          "id": "exp8",
+          "desc": "New Laptop",
+          "amount": 950,
+          "accountId": "acc1"
+        }
+      ],
+      "savings": [
+        {
+          "id": "sav2",
+          "desc": "Emergency Fund",
+          "amount": 150,
+          "accountId": "acc2"
+        }
+      ]
+    },
+    "2025-10": {
+      "incomes": [
+        {
+          "id": "inc5",
+          "desc": "Hackathon Prize",
+          "amount": 600,
+          "accountId": "acc1"
+        }
+      ],
+      "expenses": [
+        {
+          "id": "exp9",
+          "desc": "Clothes Shopping",
+          "amount": 140,
+          "accountId": "acc1"
+        }
+      ],
+      "savings": []
+    },
+    "2025-11": {
+      "incomes": [],
+      "expenses": [
+        {
+          "id": "exp10",
+          "desc": "Weekend Trip - Madrid",
+          "amount": 310,
+          "accountId": "acc1"
+        }
+      ],
+      "savings": [
+        {
+          "id": "sav3",
+          "desc": "Christmas Savings",
+          "amount": 400,
+          "accountId": "acc2"
+        }
+      ]
+    },
+    "2025-12": {
+      "incomes": [
+        {
+          "id": "inc6",
+          "desc": "Christmas Gift (Family)",
+          "amount": 350,
+          "accountId": "acc1"
+        },
+        {
+          "id": "inc7",
+          "desc": "Freelance Project",
+          "amount": 520,
+          "accountId": "acc1"
+        }
+      ],
+      "expenses": [
+        {
+          "id": "exp11",
+          "desc": "Travel - London",
+          "amount": 700,
+          "accountId": "acc1"
+        },
+        {
+          "id": "exp12",
+          "desc": "Christmas Gifts",
+          "amount": 280,
+          "accountId": "acc1"
+        }
+      ],
+      "savings": [
+        {
+          "id": "sav4",
+          "desc": "End-of-Year Transfer",
+          "amount": 600,
+          "accountId": "acc2"
+        }
+      ]
+    }
+  }
+}
