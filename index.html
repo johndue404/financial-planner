@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Financial Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 16px 0px;
+        }
+
+        .month-card {
+            min-width: 280px;
+        }
+
+        .sticky-actions {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: rgba(0, 0, 0, .35);
+            backdrop-filter: blur(6px);
+        }
+
+        .muted {
+            opacity: .85;
+        }
+
+        .list-compact li {
+            margin-bottom: .25rem;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, .08);
+            margin: .5rem 0 1rem;
+        }
+
+        .small-help {
+            font-size: .85rem;
+            opacity: .8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <header class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top mb-3">
+            <div class="container">
+                <!-- Brand -->
+                <a class="navbar-brand h4 m-0">📊 Financial Planner</a>
+
+                <!-- Toggler for mobile -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarActions">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Actions -->
+                <div class="collapse navbar-collapse justify-content-end" id="navbarActions">
+                    <div class="btn-toolbar gap-2" role="toolbar">
+
+                        <!-- Main Action -->
+                        <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#itemModal">
+                            ➕ Income/Expense
+                        </button>
+
+                        <!-- Manage Dropdown -->
+                        <div class="btn-group">
+                            <button class="btn btn-outline-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                ⚙️ Manage
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <button class="dropdown-item" data-bs-toggle="modal"
+                                        data-bs-target="#semesterModal">
+                                        🗓️ Semester
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" data-bs-toggle="modal"
+                                        data-bs-target="#accountsModal">
+                                        🏦 Accounts
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#savingsModal">
+                                        💰 Savings
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Data Dropdown -->
+                        <div class="btn-group">
+                            <button class="btn btn-outline-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                📂 Data
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <button class="dropdown-item" onclick="exportData()">⬇️ Export</button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item"
+                                        onclick="document.getElementById('importFile').click()">⬆️ Import</button>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <button class="dropdown-item text-danger" onclick="resetCycle()">🗑️ New
+                                        Cycle</button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Hidden file input for import -->
+                        <input type="file" id="importFile" class="d-none" accept=".json" onchange="importData(event)">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Summary Row -->
+            <div class="row g-3 mb-3">
+                <div class="col-lg-12">
+                    <div class="card h-full">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h2 class="h5 m-0">Semester Overview</h2>
+                                <span id="semesterLabel" class="badge text-bg-secondary"></span>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <div class="fw-semibold muted">Total Incomes</div>
+                                    <div id="sumIncomes" class="h5 m-0"></div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="fw-semibold muted">Total Expenses</div>
+                                    <div id="sumExpenses" class="h5 m-0"></div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="fw-semibold muted">Total Savings Goals</div>
+                                    <div id="sumSavings" class="h5 m-0"></div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="fw-semibold muted">Net (All Months)</div>
+                                    <div id="sumNet" class="h5 m-0"></div>
+                                </div>
+                            </div>
+                            <!-- <p class="small-help mt-2">Net = Incomes − Expenses − Savings (summed across the 6 months). -->
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h2 class="h5">Account Balances</h2>
+                            <div class="divider"></div>
+                            <div id="accountsSummary"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Months -->
+            <div id="monthsContainer" class="row g-3"></div>
+        </div>
+    </div>
+
+    <!-- Semester Modal -->
+    <div class="modal fade" id="semesterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="modal-content" onsubmit="applySemester(event)">
+                <div class="modal-header">
+                    <h5 class="modal-title">Semester Setup</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Start</label>
+                        <select id="semesterStart" class="form-select" required>
+                            <option value="0">January</option>
+                            <option value="6">July</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Year</label>
+                        <input id="semesterYear" type="number" class="form-control" min="1900" max="3000" required>
+                        <div class="form-text">Choose the calendar year the semester starts.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Accounts Modal -->
+    <div class="modal fade" id="accountsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form class="modal-content" onsubmit="addAccount(event)">
+                <div class="modal-header">
+                    <h5 class="modal-title">Accounts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label">Account Name</label>
+                            <input id="accName" class="form-control" placeholder="e.g., Main Bank, Savings" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Starting Balance (€)</label>
+                            <input id="accStart" type="number" step="0.01" class="form-control" required>
+                        </div>
+                        <div class="col-md-2 d-grid">
+                            <button class="btn btn-success" type="submit">Add</button>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div id="accountsList"></div>
+                    <p class="small-help mt-2">You can create multiple accounts. Each income, expense, and savings entry
+                        can be assigned to a specific account.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Income/Expense Modal -->
+    <div class="modal fade" id="itemModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="modal-content" onsubmit="addItem(event)">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Income/Expense</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Type</label>
+                        <select id="itemType" class="form-select" required>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Description</label>
+                        <input id="itemDesc" class="form-control" placeholder="e.g., Salary, Rent" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Amount (€)</label>
+                        <input id="itemAmount" type="number" step="0.01" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Account</label>
+                        <select id="itemAccount" class="form-select" required></select>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="itemFixed">
+                            <label class="form-check-label" for="itemFixed">Fixed (apply to all 6 months)</label>
+                        </div>
+                    </div>
+                    <div class="col-12" id="itemMonthWrap">
+                        <label class="form-label">Month</label>
+                        <select id="itemMonth" class="form-select"></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Savings Modal -->
+    <div class="modal fade" id="savingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="modal-content" onsubmit="addSavings(event)">
+                <div class="modal-header">
+                    <h5 class="modal-title">Set Savings Goal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Month</label>
+                        <select id="savingsMonth" class="form-select" required></select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Amount (€)</label>
+                        <input id="savingsAmount" type="number" step="0.01" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Account</label>
+                        <select id="savingsAccount" class="form-select" required></select>
+                    </div>
+                    <p class="small-help m-0">Savings reduce the available balance of the selected account for that
+                        month.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ---------- Utilities ----------
+        const uid = () => Math.random().toString(36).slice(2, 10);
+        const fmt = (n) => `€${(Number(n) || 0).toFixed(2)}`;
+        const ymKey = (y, m) => `${y}-${String(m + 1).padStart(2, '0')}`;
+
+        // ---------- Initial Data Model ----------
+        let data = {
+            semester: { year: new Date().getFullYear(), startMonth: 0 }, // 0=Jan, 6=Jul
+            accounts: [],
+            fixed: { incomes: [], expenses: [] }, // apply to all months
+            months: {} // keyed by YYYY-MM -> { incomes:[], expenses:[], savings:[] }
+        };
+
+        // initialize months for current default semester
+        function buildSemesterMonths() {
+            data.months = {};
+            for (let i = 0; i < 6; i++) {
+                const m = data.semester.startMonth + i;
+                const y = data.semester.year + Math.floor(m / 12);
+                const mm = m % 12;
+                data.months[ymKey(y, mm)] = { incomes: [], expenses: [], savings: [] }; // savings: [{accountId, amount}]
+            }
+        }
+
+        // ---------- DOM Refs ----------
+        const monthsContainer = document.getElementById('monthsContainer');
+        const semesterLabel = document.getElementById('semesterLabel');
+        const sumIncomesEl = document.getElementById('sumIncomes');
+        const sumExpensesEl = document.getElementById('sumExpenses');
+        const sumSavingsEl = document.getElementById('sumSavings');
+        const sumNetEl = document.getElementById('sumNet');
+        const accountsSummaryEl = document.getElementById('accountsSummary');
+        const accountsListEl = document.getElementById('accountsList');
+
+        // ---------- UI Helpers ----------
+        function monthLabels() {
+            const labels = [];
+            let m0 = data.semester.startMonth;
+            let y0 = data.semester.year;
+            for (let i = 0; i < 6; i++) {
+                const m = m0 + i;
+                const y = y0 + Math.floor(m / 12);
+                const mm = m % 12;
+                const d = new Date(y, mm, 1);
+                labels.push({ key: ymKey(y, mm), label: d.toLocaleString('default', { month: 'long', year: 'numeric' }) });
+            }
+            return labels;
+        }
+
+        function refreshSelectOptions() {
+            // Months in forms
+            const monthSelIds = ['itemMonth', 'savingsMonth'];
+            const months = monthLabels();
+            monthSelIds.forEach(id => {
+                const el = document.getElementById(id);
+                el.innerHTML = months.map(m => `<option value="${m.key}">${m.label}</option>`).join('');
+            });
+
+            // Accounts in forms
+            const accountSelIds = ['itemAccount', 'savingsAccount'];
+            accountSelIds.forEach(id => {
+                const el = document.getElementById(id);
+                el.innerHTML = data.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+            });
+        }
+
+        function renderAccountsPanel() {
+            if (!data.accounts.length) {
+                accountsListEl.innerHTML = `<div class="alert alert-warning">No accounts yet. Add one above.</div>`;
+                return;
+            }
+            const rows = data.accounts.map(a => `
+        <tr>
+          <td class="fw-semibold">${a.name}</td>
+          <td class="text-end">${fmt(a.start)}</td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-danger" onclick="removeAccount('${a.id}')">Remove</button>
+          </td>
+        </tr>
+      `).join('');
+            accountsListEl.innerHTML = `
+        <div class="table-responsive">
+          <table class="table table-dark table-sm align-middle">
+            <thead><tr><th>Name</th><th class="text-end">Start Balance</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+        }
+
+        function computeMonthTotals(monthKey) {
+            const month = data.months[monthKey];
+            const fixedIncomes = data.fixed.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
+            const fixedExpenses = data.fixed.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+
+            const oneIncomes = month.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
+            const oneExpenses = month.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+            const savingsTotal = month.savings.reduce((s, sv) => s + Number(sv.amount || 0), 0);
+
+            const totals = {
+                incomes: fixedIncomes + oneIncomes,
+                expenses: fixedExpenses + oneExpenses,
+                savings: savingsTotal,
+            };
+            totals.net = totals.incomes - totals.expenses - totals.savings;
+            return totals;
+        }
+
+        function renderMonths() {
+            const months = monthLabels();
+            monthsContainer.innerHTML = months.map(m => {
+                const totals = computeMonthTotals(m.key);
+                const month = data.months[m.key];
+                const netClass = totals.net >= 0 ? 'text-success' : 'text-danger';
+                const goalHit = totals.incomes - totals.expenses >= totals.savings;
+
+                // Build lists
+                const fixedIncomeList = data.fixed.incomes.map(i => `<li>${i.desc} — ${fmt(i.amount)} <span class="text-secondary">(fixed, ${accountName(i.accountId)})</span></li>`).join('');
+                const fixedExpenseList = data.fixed.expenses.map(e => `<li>${e.desc} — ${fmt(e.amount)} <span class="text-secondary">(fixed, ${accountName(e.accountId)})</span></li>`).join('');
+                const oneIncomeList = month.incomes.map(i => `<li>${i.desc} — ${fmt(i.amount)} <span class="text-secondary">(${accountName(i.accountId)})</span></li>`).join('');
+                const oneExpenseList = month.expenses.map(e => `<li>${e.desc} — ${fmt(e.amount)} <span class="text-secondary">(${accountName(e.accountId)})</span></li>`).join('');
+                const savingsList = month.savings.map(sv => `<li>${fmt(sv.amount)} → <span class="text-secondary">${accountName(sv.accountId)}</span></li>`).join('');
+
+                return `
+        <div class="col-12 col-md-6 col-xl-4">
+          <div class="card h-100 month-card">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title m-0">${m.label}</h5>
+                <span class="badge ${goalHit ? 'text-bg-success' : 'text-bg-danger'}">${goalHit ? 'Goal OK' : 'Goal Miss'}</span>
+              </div>
+              <div class="mt-2">
+                <div class="d-flex justify-content-between"><span class="muted">Incomes</span><span class="fw-semibold">${fmt(totals.incomes)}</span></div>
+                <div class="d-flex justify-content-between"><span class="muted">Expenses</span><span class="fw-semibold">${fmt(totals.expenses)}</span></div>
+                <div class="d-flex justify-content-between"><span class="muted">Savings</span><span class="fw-semibold">${fmt(totals.savings)}</span></div>
+                <div class="d-flex justify-content-between"><span class="muted">Net</span><span class="fw-bold ${netClass}">${fmt(totals.net)}</span></div>
+              </div>
+              <div class="divider"></div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="fw-semibold">Fixed Incomes</div>
+                  <ul class="list-compact">${fixedIncomeList || '<li class="text-secondary">—</li>'}</ul>
+                </div>
+                <div class="col-12">
+                  <div class="fw-semibold">One-time Incomes</div>
+                  <ul class="list-compact">${oneIncomeList || '<li class="text-secondary">—</li>'}</ul>
+                </div>
+                <div class="col-12">
+                  <div class="fw-semibold">Fixed Expenses</div>
+                  <ul class="list-compact">${fixedExpenseList || '<li class="text-secondary">—</li>'}</ul>
+                </div>
+                <div class="col-12">
+                  <div class="fw-semibold">One-time Expenses</div>
+                  <ul class="list-compact">${oneExpenseList || '<li class="text-secondary">—</li>'}</ul>
+                </div>
+                <div class="col-12">
+                  <div class="fw-semibold">Savings (by Account)</div>
+                  <ul class="list-compact">${savingsList || '<li class="text-secondary">—</li>'}</ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+            }).join('');
+
+            // Overview totals
+            const totals = Object.keys(data.months).map(k => computeMonthTotals(k))
+                .reduce((acc, t) => ({ incomes: acc.incomes + t.incomes, expenses: acc.expenses + t.expenses, savings: acc.savings + t.savings }), { incomes: 0, expenses: 0, savings: 0 });
+            const netAll = totals.incomes - totals.expenses - totals.savings;
+
+            sumIncomesEl.textContent = fmt(totals.incomes);
+            sumExpensesEl.textContent = fmt(totals.expenses);
+            sumSavingsEl.textContent = fmt(totals.savings);
+            sumNetEl.innerHTML = `<span class="${netAll >= 0 ? 'text-success' : 'text-danger'} fw-bold">${fmt(netAll)}</span>`;
+
+            // Accounts summary
+            renderAccountsSummary();
+
+            // Header badge
+            const labels = monthLabels();
+            semesterLabel.textContent = `${labels[0].label} → ${labels[5].label}`;
+        }
+
+        function accountName(id) {
+            const a = data.accounts.find(a => a.id === id);
+            return a ? a.name : '—';
+        }
+
+        function renderAccountsSummary() {
+            if (!data.accounts.length) {
+                accountsSummaryEl.innerHTML = `<div class="alert alert-warning">No accounts defined.</div>`;
+                return;
+            }
+
+            // Compute sums per account across the semester
+            const accTotals = {};
+            data.accounts.forEach(a => accTotals[a.id] = { income: 0, expense: 0, savings: 0 });
+
+            // fixed
+            data.fixed.incomes.forEach(i => accTotals[i.accountId] && (accTotals[i.accountId].income += Number(i.amount || 0) * 6));
+            data.fixed.expenses.forEach(e => accTotals[e.accountId] && (accTotals[e.accountId].expense += Number(e.amount || 0) * 6));
+
+            // one-time across months
+            Object.values(data.months).forEach(m => {
+                m.incomes.forEach(i => accTotals[i.accountId] && (accTotals[i.accountId].income += Number(i.amount || 0)));
+                m.expenses.forEach(e => accTotals[e.accountId] && (accTotals[e.accountId].expense += Number(e.amount || 0)));
+                m.savings.forEach(sv => accTotals[sv.accountId] && (accTotals[sv.accountId].savings += Number(sv.amount || 0)));
+            });
+
+            const rows = data.accounts.map(a => {
+                const t = accTotals[a.id] || { income: 0, expense: 0, savings: 0 };
+                const finalVal = Number(a.start || 0) + t.income - t.expense - t.savings;
+                return `
+          <tr>
+            <td>${a.name}</td>
+            <td class="text-end">${fmt(a.start)}</td>
+            <td class="text-end">${fmt(t.income)}</td>
+            <td class="text-end">${fmt(t.expense)}</td>
+            <td class="text-end">${fmt(t.savings)}</td>
+            <td class="text-end fw-bold ${finalVal >= 0 ? 'text-success' : 'text-danger'}">${fmt(finalVal)}</td>
+          </tr>
+        `;
+            }).join('');
+
+            accountsSummaryEl.innerHTML = `
+        <div class="table-responsive">
+          <table class="table table-dark table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Account</th>
+                <th class="text-end">Start</th>
+                <th class="text-end">Incomes</th>
+                <th class="text-end">Expenses</th>
+                <th class="text-end">Savings</th>
+                <th class="text-end">Final</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+        }
+
+        // ---------- Actions ----------
+        function applySemester(e) {
+            e.preventDefault();
+            const startMonth = Number(document.getElementById('semesterStart').value);
+            const year = Number(document.getElementById('semesterYear').value);
+
+            data.semester.startMonth = startMonth;
+            data.semester.year = year;
+            buildSemesterMonths(); // reset months when changing semester
+            refreshSelectOptions();
+            renderMonths();
+
+            bootstrap.Modal.getInstance(document.getElementById('semesterModal')).hide();
+        }
+
+        function addAccount(e) {
+            e.preventDefault();
+            const name = document.getElementById('accName').value.trim();
+            const start = Number(document.getElementById('accStart').value);
+            if (!name) return;
+
+            data.accounts.push({ id: uid(), name, start });
+            document.getElementById('accName').value = '';
+            document.getElementById('accStart').value = '';
+            refreshSelectOptions();
+            renderAccountsPanel();
+            renderAccountsSummary();
+        }
+
+        function removeAccount(id) {
+            if (!confirm('Remove this account? Items assigned to it will show account "—".')) return;
+            data.accounts = data.accounts.filter(a => a.id !== id);
+            renderAccountsPanel();
+            refreshSelectOptions();
+            renderAccountsSummary();
+            renderMonths();
+        }
+
+        function addItem(e) {
+            e.preventDefault();
+            const type = document.getElementById('itemType').value;
+            const desc = document.getElementById('itemDesc').value.trim();
+            const amount = Number(document.getElementById('itemAmount').value);
+            const accountId = document.getElementById('itemAccount').value;
+            const isFixed = document.getElementById('itemFixed').checked;
+
+            if (isFixed) {
+                data.fixed[type === 'income' ? 'incomes' : 'expenses'].push({ id: uid(), desc, amount, accountId });
+            } else {
+                const monthKey = document.getElementById('itemMonth').value;
+                const target = data.months[monthKey];
+                target[type === 'income' ? 'incomes' : 'expenses'].push({ id: uid(), desc, amount, accountId });
+            }
+
+            e.target.reset();
+            document.getElementById('itemFixed').checked = false;
+            toggleItemMonthVisibility();
+
+            refreshSelectOptions();
+            renderMonths();
+            bootstrap.Modal.getInstance(document.getElementById('itemModal')).hide();
+        }
+
+        function addSavings(e) {
+            e.preventDefault();
+            const monthKey = document.getElementById('savingsMonth').value;
+            const amount = Number(document.getElementById('savingsAmount').value);
+            const accountId = document.getElementById('savingsAccount').value;
+
+            data.months[monthKey].savings.push({ id: uid(), amount, accountId });
+
+            e.target.reset();
+            refreshSelectOptions();
+            renderMonths();
+            bootstrap.Modal.getInstance(document.getElementById('savingsModal')).hide();
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'financial_plan.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const obj = JSON.parse(e.target.result);
+                    // basic shape guard
+                    if (!obj.semester || !obj.accounts || !obj.months || !obj.fixed) throw new Error('Invalid JSON shape.');
+                    data = obj;
+                    refreshSelectOptions();
+                    renderAccountsPanel();
+                    renderMonths();
+                } catch (err) {
+                    alert('Invalid JSON file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            // reset input so the same file can be chosen again later
+            event.target.value = '';
+        }
+
+        function resetCycle() {
+            if (!confirm('Start a new cycle? This clears all items, fixed entries, and savings.')) return;
+            const keepSemester = { ...data.semester };
+            data = {
+                semester: keepSemester,
+                accounts: [],
+                fixed: { incomes: [], expenses: [] },
+                months: {}
+            };
+            buildSemesterMonths();
+            refreshSelectOptions();
+            renderAccountsPanel();
+            renderMonths();
+        }
+
+        // ---------- Form Dynamics ----------
+        function toggleItemMonthVisibility() {
+            const isFixed = document.getElementById('itemFixed').checked;
+            document.getElementById('itemMonthWrap').style.display = isFixed ? 'none' : 'block';
+        }
+
+        document.getElementById('itemFixed').addEventListener('change', toggleItemMonthVisibility);
+
+        // ---------- Init ----------
+        (function init() {
+            // default semester: choose nearest upcoming semester start
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth(); // 0-11
+            // If before July -> default to Jan current year; else -> Jul current year
+            data.semester.startMonth = currentMonth < 6 ? 0 : 6;
+            data.semester.year = currentYear;
+
+            // Seed months
+            buildSemesterMonths();
+
+            // Prefill semester modal inputs
+            document.getElementById('semesterStart').value = String(data.semester.startMonth);
+            document.getElementById('semesterYear').value = data.semester.year;
+
+            refreshSelectOptions();
+            renderAccountsPanel();
+            renderMonths();
+            toggleItemMonthVisibility();
+        })();
+    </script>
+</body>
+
+</html>
